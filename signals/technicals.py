@@ -55,12 +55,21 @@ def get_technical_signal(symbol):
         return None
 
 def run_screener(nifty_csv="data/nifty50.csv"):
+    import streamlit as st  # Add this only if you're running from app.py
     df = pd.read_csv(nifty_csv)
+    st.write("📄 Nifty50 symbols loaded:", df["symbol"].tolist())
+    
     results = []
-    for _, row in df.iterrows():
-        result = get_technical_signal(row["symbol"])
+    for symbol in df["symbol"]:
+        st.write(f"🔍 Checking {symbol}...")
+        result = get_technical_signal(symbol)
         if result:
+            st.success(f"✅ Match found: {result}")
             results.append(result)
+        else:
+            st.warning(f"❌ No signal for {symbol}")
+    
+    st.write(f"📊 Total signals found: {len(results)}")
     return pd.DataFrame(results)
 
 
