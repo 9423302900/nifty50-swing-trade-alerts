@@ -11,8 +11,8 @@ tech_signals = run_screener()
 st.success(f"✅ Found {len(tech_signals)} stocks with breakout setups")
 
 fund_signals = load_fundamentals()
+merged = pd.merge(tech_signals, fund_signals, on="symbol", how="inner")
 
-merged = pd.merge(tech_signals, fund_signals, how="inner", left_on="symbol", right_on="company")
 
 if merged.empty:
     st.warning("⚠️ No stocks meet both technical and fundamental criteria")
