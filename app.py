@@ -11,6 +11,9 @@ tech_signals = run_screener()
 st.success(f"✅ Found {len(tech_signals)} stocks with breakout setups")
 
 fund_signals = load_fundamentals()
+st.write("Tech signal columns:", tech_signals.columns.tolist())
+st.write("Fundamental columns:", fund_signals.columns.tolist())
+
 merged = pd.merge(tech_signals, fund_signals, on="symbol", how="inner")
 
 
