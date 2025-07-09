@@ -11,7 +11,6 @@ def get_technical_signal(symbol):
 
         df.dropna(inplace=True)
 
-        # Indicators
         rsi = RSIIndicator(close=df["Close"], window=14)
         macd = MACD(close=df["Close"])
         adx = ADXIndicator(high=df["High"], low=df["Low"], close=df["Close"])
@@ -62,3 +61,4 @@ def run_screener(nifty_csv="data/nifty50.csv"):
         if result:
             results.append(result)
     return pd.DataFrame(results)
+
