@@ -1,8 +1,7 @@
 import pandas as pd
 import yfinance as yf
-from ta.trend import EMAIndicator, ADXIndicator
+from ta.trend import EMAIndicator, ADXIndicator, MACD
 from ta.momentum import RSIIndicator
-from ta.trend import MACD
 
 def get_technical_signal(symbol):
     try:
@@ -12,13 +11,21 @@ def get_technical_signal(symbol):
 
         df.dropna(inplace=True)
 
-        df["rsi"] = RSIIndicator(df["Close"], window=14).rsi()
-        df["macd"] = MACD(df["Close"]).macd_diff()
-        df["adx"] = ADXIndicator(df["High"], df["Low"], df["Close"]).adx()
-        df["+DI"] = ADXIndicator(df["High"], df["Low"], df["Close"]).adx_pos()
-        df["-DI"] = ADXIndicator(df["High"], df["Low"], df["Close"]).adx_neg()
-        df["ema20"] = EMAIndicator(df["Close"], window=20).ema_indicator()
-        df["ema50"] = EMAIndicator(df["Close"], window=50).ema_indicator()
+        # Indicators (single instance for ADX)
+        rsi = RSIIndicator(close=df["Close"], window=14)
+        macd = MACD(close=df["Close"])
+        adx = ADXIndicator(high=df["High"], low=df["Low"], close=df["Close"])
+        ema20 = EMAIndicator(close=df["Close"], window=20)
+        ema50 = EMAIndicator(close=df["Close"], window=50)
+
+        # Apply indicators
+        df["rsi"] = rsi.rsi()
+        df["macd"] = macd.macd_diff()
+        df["adx"] = adx.adx()
+        df["+DI"] = adx.adx_pos()
+        df["-DI"] = adx.adx_neg()
+        df["ema20"] = ema20.ema_indicator()
+        df["ema50"] = ema50.ema_indicator()
         df["avg_vol"] = df["Volume"].rolling(window=20).mean()
 
         latest = df.iloc[-1]
@@ -41,7 +48,9 @@ def get_technical_signal(symbol):
                 "close": round(latest["Close"], 2),
                 "volume": int(latest["Volume"]),
             }
+
         return None
+
     except Exception as e:
         print(f"Error for {symbol}: {e}")
         return None
