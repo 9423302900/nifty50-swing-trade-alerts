@@ -11,12 +11,14 @@ def get_technical_signal(symbol):
 
         df.dropna(inplace=True)
 
+        # Indicators
         rsi = RSIIndicator(close=df["Close"], window=14)
         macd = MACD(close=df["Close"])
         adx = ADXIndicator(high=df["High"], low=df["Low"], close=df["Close"])
         ema20 = EMAIndicator(close=df["Close"], window=20)
         ema50 = EMAIndicator(close=df["Close"], window=50)
 
+        # Calculations
         df["rsi"] = rsi.rsi()
         df["macd"] = macd.macd_diff()
         df["adx"] = adx.adx()
@@ -28,13 +30,12 @@ def get_technical_signal(symbol):
 
         latest = df.iloc[-1]
 
+        # Relaxed conditions
         conditions = [
-            60 < latest["rsi"] < 70,
+            latest["rsi"] > 55,
             latest["macd"] > 0,
-            latest["adx"] > 25 and latest["+DI"] > latest["-DI"],
+            latest["adx"] > 20,
             latest["Close"] > latest["ema20"],
-            latest["Close"] > latest["ema50"],
-            latest["Volume"] > 2 * latest["avg_vol"],
         ]
 
         if all(conditions):
@@ -61,4 +62,5 @@ def run_screener(nifty_csv="data/nifty50.csv"):
         if result:
             results.append(result)
     return pd.DataFrame(results)
+
 
