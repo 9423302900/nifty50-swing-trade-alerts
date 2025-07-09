@@ -7,15 +7,27 @@ from utils.alert import send_telegram_message
 st.set_page_config(layout="wide")
 st.title("📈 NIFTY50 Swing Trade Signal Dashboard")
 
+# Run technical screener
 tech_signals = run_screener()
-st.success(f"✅ Found {len(tech_signals)} stocks with breakout setups")
+st.write("⚙️ Tech signal columns:", tech_signals.columns.tolist())
+st.write("🧾 Tech signals preview:")
+st.dataframe(tech_signals)
 
+# Handle case when no technical signals are found
+if tech_signals.empty:
+    st.warning("⚠️ No technical signals found. Check indicator conditions or data files.")
+    st.stop()
+
+# Load fundamentals
 fund_signals = load_fundamentals()
-st.write("Tech signal columns:", tech_signals.columns.tolist())
-st.write("Fundamental columns:", fund_signals.columns.tolist())
+st.write("📊 Fundamental columns:", fund_signals.columns.tolist())
 
-merged = pd.merge(tech_signals, fund_signals, on="symbol", how="inner")
-
+# Merge on 'symbol'
+try:
+    merged = pd.merge(tech_signals, fund_signals, on="symbol", how="inner")
+except KeyError as e:
+    st.error(f"Merge failed: missing column {e}")
+    st.stop()
 
 if merged.empty:
     st.warning("⚠️ No stocks meet both technical and fundamental criteria")
@@ -53,3 +65,4 @@ else:
                 st.success(f"✅ Alert sent for {symbol}")
             else:
                 st.error(f"❌ Failed to send alert for {symbol}")
+
