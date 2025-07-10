@@ -5,9 +5,9 @@ def load_fundamentals(csv_path="data/fundamentals.csv"):
     df.columns = [col.strip().lower().replace(" ", "_") for col in df.columns]
 
     df = df[
-        (df["eps_growth"] > 15) &
-        (df["roe"] > 15) &
-        (df["peg"] < 1.5) &
+        (df["eps_growth"] > 15) AND
+        (df["roe"] > 15) AND
+        (df["peg"] < 1.5) AND
         (df["debt_to_equity"] < 0.5)
     ]
 
